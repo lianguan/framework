@@ -903,10 +903,11 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
 
     public function testModelsAssumeTheirName()
     {
+        require_once __DIR__.'/stubs/EloquentModelNamespacedStub.php';
+
         $model = new EloquentModelWithoutTableStub;
         $this->assertEquals('eloquent_model_without_table_stubs', $model->getTable());
 
-        require_once __DIR__.'/stubs/EloquentModelNamespacedStub.php';
         $namespacedModel = new Foo\Bar\EloquentModelNamespacedStub;
         $this->assertEquals('eloquent_model_namespaced_stubs', $namespacedModel->getTable());
     }
@@ -1062,6 +1063,18 @@ class DatabaseEloquentModelTest extends PHPUnit_Framework_TestCase
 
         $model->setVisible([]);
         $this->assertEquals([], $model->toArray());
+    }
+
+    public function testGetMutatedAttributes()
+    {
+        $model = new EloquentModelGetMutatorsStub;
+
+        $this->assertEquals(['first_name', 'middle_name', 'last_name'], $model->getMutatedAttributes());
+
+        EloquentModelGetMutatorsStub::resetMutatorCache();
+
+        EloquentModelGetMutatorsStub::$snakeAttributes = false;
+        $this->assertEquals(['firstName', 'middleName', 'lastName'], $model->getMutatedAttributes());
     }
 
     public function testReplicateCreatesANewModelInstanceWithSameAttributeValues()
@@ -1450,6 +1463,42 @@ class EloquentModelAppendsStub extends Model
     public function getStudlyCasedAttribute()
     {
         return 'StudlyCased';
+    }
+}
+
+class EloquentModelGetMutatorsStub extends Model
+{
+    public static function resetMutatorCache()
+    {
+        static::$mutatorCache = [];
+    }
+
+    public function getFirstNameAttribute()
+    {
+    }
+
+    public function getMiddleNameAttribute()
+    {
+    }
+
+    public function getLastNameAttribute()
+    {
+    }
+
+    public function doNotgetFirstInvalidAttribute()
+    {
+    }
+
+    public function doNotGetSecondInvalidAttribute()
+    {
+    }
+
+    public function doNotgetThirdInvalidAttributeEither()
+    {
+    }
+
+    public function doNotGetFourthInvalidAttributeEither()
+    {
     }
 }
 
